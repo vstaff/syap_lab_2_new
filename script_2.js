@@ -22,9 +22,9 @@ function* getRandomItem(arr) {
       `arr[index]=${arr[index]}`
     )
 
-    // ОСОБЕННОСТЬ JS: ключевое слово yield - 
+    // ОСОБЕННОСТЬ JS: ключевое слово yield -
     // в отличие от return - yield позволяет продолжить
-    // выполнение генератора 
+    // выполнение генератора
     yield arr[index];
   }
 }

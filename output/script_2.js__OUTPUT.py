@@ -23,16 +23,16 @@ def getRandomItem(arr):
             f'arr[index]=${arr[index]}'
         )
 
-        # ОСОБЕННОСТЬ JS: ключевое слово yield - 
+        # ОСОБЕННОСТЬ JS: ключевое слово yield -
         # в отличие от return - yield позволяет продолжить
-        # выполнение генератора 
+        # выполнение генератора
         yield arr[index]
     
 
 
 # случайное число в диапазоне [min max]
 # ОСОБЕННОСТЬ JS: стрелочная функция (на Python можно воспользоваться lambda выражениями)
-getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min
+getRandomNumber = (min, max) => math.floor(random.random() * (max - min + 1)) + min
 
 numbers = []
 

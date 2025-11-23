@@ -226,6 +226,12 @@ types_converter = dict(
     ),
 )
 
+# перевод обращения к различным библиотекам и их функциям
+libs_converter = {
+    "Math.random": "random.random",
+    "Math.floor": "math.floor",
+}
+
 def translate(filename: str) -> None:
     lines: list[str] = []
 
@@ -266,9 +272,29 @@ def translate(filename: str) -> None:
             # 2) ищутся строки в которых у переменных вызывается какой то метод, или атрибут; если
             #    ранее данные об этой переменной и её типе были сохранены - значит мы можем
             #    переименовать название метода или атрибута
+            # UPD: также на этом этапе будет происходить трансляция обращений к различным библиотекам
+            # js-библиотеки и обращения к ним будут заменены на python'вские
             for i in range(len(lines)):
                 line = lines[i]
                 new_data_in_types_storage = False
+
+                for js_lib, python_lib in libs_converter.items():
+                    # шаблон для регулярки - у какой-то библиотеки
+                    # вызывается какая-то функция
+                    lib_call_pattern = re.compile(
+                        r'([A-Za-z_$][A-Za-z0-9_$]*)(\.)([A-Za-z_$][A-Za-z0-9_$]*)(\([^()]*\))?'
+                    )
+                    # если в текущей строке происходит обращение к функции
+                    # из какой-то библиотеки
+                    match_result = re.findall(lib_call_pattern, lines[i])
+                    if match_result is None:
+                        continue
+
+                    for possible_lib_call in match_result:
+                        possible_lib_call = ''.join(possible_lib_call).replace("(", "").replace(")", "")
+                        if possible_lib_call in [*libs_converter.keys()]:
+                            lines[i] = re.sub(possible_lib_call, libs_converter[possible_lib_call], lines[i])
+
                 for tp in types_converter:
                     js_type_name = types_converter[tp].get("js")
                     py_type_name = types_converter[tp].get("python")
@@ -304,7 +330,7 @@ def translate(filename: str) -> None:
                     method_attribute = split_parts[1].strip()
                     method_attribute = re.sub(r'\(.+', '', method_attribute)
                     variables_in_storage = [*types_storage.keys()]
-                    print(lines[i])
+                    # print(lines[i])
                     if variable in variables_in_storage:
                         repl = types_converter[types_storage[variable]].get("methods_attributes").get(method_attribute) or method_attribute
                         lines[i] = re.sub(
@@ -314,10 +340,10 @@ def translate(filename: str) -> None:
                         )
 
         output_file.writelines(lines)
-    print(types_storage)
+    # print(types_storage)
 
 def main():
-    # translate("./script_1.js")
+    translate("./script_1.js")
     translate("./script_2.js")
 
 
