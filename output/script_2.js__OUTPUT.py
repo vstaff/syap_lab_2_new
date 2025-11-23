@@ -1,3 +1,5 @@
+import random
+import math
 AMOUNT = 10
 
 # ОСОБЕННОСТЬ JS - функция генератор
@@ -6,7 +8,7 @@ def getRandomItem(arr):
     prevIndices = set()
 
     while (prevIndices.__len__() != AMOUNT):
-        index = getRandomNumber(0, AMOUNT - 1)
+        index = getRandomNumberInRange(0, AMOUNT - 1)
 
         # ОСОБЕННОСТЬ JS: строковая интерполяция
         print(
@@ -31,8 +33,10 @@ def getRandomItem(arr):
 
 
 # случайное число в диапазоне [min max]
-# ОСОБЕННОСТЬ JS: стрелочная функция (на Python можно воспользоваться lambda выражениями)
-getRandomNumber = (min, max) => math.floor(random.random() * (max - min + 1)) + min
+def getRandomNumberInRange(min, max):
+
+        return math.floor(random.random() * (max - min + 1)) + min
+
 
 numbers = []
 

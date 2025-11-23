@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46091788-03e2-4912-99ea-e54c8d42078b" name="Changes" comment="исправил мелкие ошибки: при трансляции массива с js на python появлялись случайные символы \ возле квадратных скобок &#10;также исправил ошибку из-за которой не получалось добавлять переменные массивы в types_storage - проблема была с регулярным выражением">
+    <list default="true" id="46091788-03e2-4912-99ea-e54c8d42078b" name="Changes" comment="второй скрипт почти полностью транслируется&#10;осталось придумать как сделать так, чтобы стрелочная функция превращалась в лямбду&#10;и еще добавить импорт библиотек">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/script_1.js__OUTPUT.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/output/script_2.js__OUTPUT.py" beforeDir="false" afterPath="$PROJECT_DIR$/output/script_2.js__OUTPUT.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/script_2.js" beforeDir="false" afterPath="$PROJECT_DIR$/script_2.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/translation.py" beforeDir="false" afterPath="$PROJECT_DIR$/translation.py" afterDir="false" />
@@ -49,7 +48,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python.translation.executor": "Debug",
+    "Python.translation.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -124,24 +123,22 @@
       <option name="project" value="LOCAL" />
       <updated>1763904612030</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="второй скрипт почти полностью транслируется&#10;осталось придумать как сделать так, чтобы стрелочная функция превращалась в лямбду&#10;и еще добавить импорт библиотек">
+      <option name="closed" value="true" />
+      <created>1763907525805</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1763907525805</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="наконец то я смог странслировать первый скрипт" />
     <MESSAGE value="теперь транслируется также второй скрипт &#10;текущая проблема - не транслируется тип массива и его методы" />
     <MESSAGE value="исправил мелкие ошибки: при трансляции массива с js на python появлялись случайные символы \ возле квадратных скобок &#10;также исправил ошибку из-за которой не получалось добавлять переменные массивы в types_storage - проблема была с регулярным выражением" />
-    <option name="LAST_COMMIT_MESSAGE" value="исправил мелкие ошибки: при трансляции массива с js на python появлялись случайные символы \ возле квадратных скобок &#10;также исправил ошибку из-за которой не получалось добавлять переменные массивы в types_storage - проблема была с регулярным выражением" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/translation.py</url>
-          <line>280</line>
-          <option name="timeStamp" value="9" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="второй скрипт почти полностью транслируется&#10;осталось придумать как сделать так, чтобы стрелочная функция превращалась в лямбду&#10;и еще добавить импорт библиотек" />
+    <option name="LAST_COMMIT_MESSAGE" value="второй скрипт почти полностью транслируется&#10;осталось придумать как сделать так, чтобы стрелочная функция превращалась в лямбду&#10;и еще добавить импорт библиотек" />
   </component>
 </project>

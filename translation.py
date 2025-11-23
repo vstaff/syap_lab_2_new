@@ -260,6 +260,8 @@ def translate(filename: str) -> None:
 
     # вторичная трансляция - исправление мелких конструкций
     with open(f'./output/{filename}__OUTPUT.py', mode='w', encoding='utf-8') as output_file:
+        # библиотеки которые нужно будет импортировать
+        libs_import_set = set()
         for i in range(len(lines)):
             for pattern, replacement in SMALL_PATCHES:
                 lines[i] = re.sub(pattern, replacement, lines[i])
@@ -278,22 +280,22 @@ def translate(filename: str) -> None:
                 line = lines[i]
                 new_data_in_types_storage = False
 
-                for js_lib, python_lib in libs_converter.items():
-                    # шаблон для регулярки - у какой-то библиотеки
-                    # вызывается какая-то функция
-                    lib_call_pattern = re.compile(
-                        r'([A-Za-z_$][A-Za-z0-9_$]*)(\.)([A-Za-z_$][A-Za-z0-9_$]*)(\([^()]*\))?'
-                    )
-                    # если в текущей строке происходит обращение к функции
-                    # из какой-то библиотеки
-                    match_result = re.findall(lib_call_pattern, lines[i])
-                    if match_result is None:
-                        continue
+                # шаблон для регулярки - у какой-то библиотеки
+                # вызывается какая-то функция
+                lib_call_pattern = re.compile(
+                    r'([A-Za-z_$][A-Za-z0-9_$]*)(\.)([A-Za-z_$][A-Za-z0-9_$]*)(\([^()]*\))?'
+                )
+                # если в текущей строке происходит обращение к функции
+                # из какой-то библиотеки
+                match_result = re.findall(lib_call_pattern, lines[i])
+                if match_result is None:
+                    continue
 
-                    for possible_lib_call in match_result:
-                        possible_lib_call = ''.join(possible_lib_call).replace("(", "").replace(")", "")
-                        if possible_lib_call in [*libs_converter.keys()]:
-                            lines[i] = re.sub(possible_lib_call, libs_converter[possible_lib_call], lines[i])
+                for possible_lib_call in match_result:
+                    possible_lib_call = ''.join(possible_lib_call).replace("(", "").replace(")", "")
+                    if possible_lib_call in [*libs_converter.keys()]:
+                        lines[i] = re.sub(possible_lib_call, libs_converter[possible_lib_call], lines[i])
+                        libs_import_set.add(libs_converter[possible_lib_call].split('.')[0])
 
                 for tp in types_converter:
                     js_type_name = types_converter[tp].get("js")
@@ -339,6 +341,8 @@ def translate(filename: str) -> None:
                             lines[i]
                         )
 
+        for lib in libs_import_set:
+            output_file.write(f'import {lib}\n')
         output_file.writelines(lines)
     # print(types_storage)
 

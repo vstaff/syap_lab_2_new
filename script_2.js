@@ -5,7 +5,7 @@ function* getRandomItem(arr) {
   const prevIndices = new Set();
 
   while (prevIndices.size != AMOUNT) {
-    const index = getRandomNumber(0, AMOUNT - 1);
+    const index = getRandomNumberInRange(0, AMOUNT - 1);
 
     // ОСОБЕННОСТЬ JS: строковая интерполяция
     console.log(
@@ -30,8 +30,9 @@ function* getRandomItem(arr) {
 }
 
 // случайное число в диапазоне [min; max]
-// ОСОБЕННОСТЬ JS: стрелочная функция (на Python можно воспользоваться lambda выражениями)
-const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+function getRandomNumberInRange(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 const numbers = [];
 
