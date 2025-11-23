@@ -27,7 +27,7 @@ function myCacheDecorator(func) {
 // функция для подсчета n-ого числа Фибоначчи
 function myFibonacci(n) {
   // проверка на то, чтобы n был положительным целым числом
-  if (!Number.isInteger(n) || n <= 0) {
+  if (!(Number.isInteger(n)) || n <= 0) {
     throw new Error("expected positive integer");
   }
 
@@ -45,6 +45,6 @@ myFibonacci = myCacheDecorator(myFibonacci)
 // без декоратора - подсчет 100 чисел Фибоначчи 
 // затянулся бы на очень долго время где-то на 60-70 элементе 
 // (если не раньше)
-for (let i = 1; i < 100; ++i) {
+for (let i = 1; i < 100; i++) {
   console.log(myFibonacci(i));
 }
