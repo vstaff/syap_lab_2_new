@@ -2,6 +2,14 @@ import re
 
 # словарь шаблонов регулярных выражений под основные конструкции языка javascript
 # объявления классов, методов, комментарии, объявление и инициализация полей классов и т.д.
+# первичный ключ (на первом уровен вложенности) - название для конструкции (вспомогательное для трансляции)
+# второй уровень вложенности:
+# regex - регулярное выражение для данной конструкции по которому конструкция идентифицируется
+# replacements - список состоящий из кортежей
+# в каждом кортеже три элемента:
+# 1) что нужно заменить
+# 2) на что нужно заменить
+# 3) сколько раз нужно заменить
 REGEXES = dict(
     class_declaration=dict(
         regex=r"class \w+ \{\n",
@@ -185,6 +193,8 @@ REGEXES = dict(
     ),
 )
 
+# мелкие изменения которые можно выполнить в конце
+# после того как основные конструкции были переведены
 SMALL_PATCHES = [
     ("undefined", "None"),
     (r"this\.#", r"self.__"),
@@ -205,6 +215,11 @@ SMALL_PATCHES = [
 ]
 
 # перевод типов из одного языка на другой
+# первичный ключ - общее для двух языков название типа (вспомогательное - нужное для трансляции)
+# второй уровень вложенности:
+# js - название типа в js
+# python - название типа в python
+# methods_attributes - словарь, в котором ключи: названия методов, аттрибутов на js, значения - аналоги в python
 types_converter = dict(
     set=dict(
         js="Set",
@@ -233,10 +248,20 @@ libs_converter = {
 }
 
 def translate(filename: str) -> None:
+    """
+    Трансляция кода из файла с именем filename
+    Транслируемый язык - JavaScript
+    Целевой язык - Python
+    результат трансляции в папке output
+    Имя выходного файла имеет формат: f"{исходное_имя}.js__OUTPUT.py"
+    :param filename: имя входного файла
+    :return: None, но по факту новый файл
+    """
     lines: list[str] = []
 
     # хранит информацию о том, какой тип должен быть у переменной
     # после трансляции на питон
+    # переменная: её тип
     types_storage = dict()
 
     with open(filename, "r", encoding="utf-8") as file:
@@ -254,95 +279,108 @@ def translate(filename: str) -> None:
 
                 for replacement in replacements:
                     lines[i] = re.sub(replacement[0], replacement[1], lines[i], count=replacement[2])
+                # чтобы случайно не перевести конструкцию повторно
                 break
-        # print(lines[i], end='')
-
 
     # вторичная трансляция - исправление мелких конструкций
+    # лол вторичная трансляция получилась сложнее первичной
+    # так получилось потому что на вторичной происходит переименования типов и библиотек
+    # сразу же будем записывать изменения в выходной файл на ходу
     with open(f'./output/{filename}__OUTPUT.py', mode='w', encoding='utf-8') as output_file:
         # библиотеки которые нужно будет импортировать
         libs_import_set = set()
         for i in range(len(lines)):
+            # вносим мелкие правки в каждой строке
             for pattern, replacement in SMALL_PATCHES:
                 lines[i] = re.sub(pattern, replacement, lines[i])
 
-            # промежуточный этап - преобразование типов между языками
-            # для начала мы сохраняем в хранилище данных о типа переменных - тип переменной
-            # одновременно (то есть в одном цикле происходят две вещи -
+            # line нужно просто для отладки, чтобы было удобнее смотреть на какой строке находимся сейчас
+            # важно иметь ввиду что при изменении через lines[i] - line остается прежней
+            line = lines[i]
+
+            # шаблон для регулярки - у какой-то библиотеки
+            # вызывается какая-то функция
+            lib_call_pattern = re.compile(
+                r'([A-Za-z_$][A-Za-z0-9_$]*)(\.)([A-Za-z_$][A-Za-z0-9_$]*)(\([^()]*\))?'
+            )
+            # проверка: происходит ли обращение к библиотекам
+            match_result = re.findall(lib_call_pattern, lines[i])
+            if match_result is None:
+                continue
+            # если да ----
+            for possible_lib_call in match_result:
+                # (предварительно нужно объединить строки
+                # так как метод findall работает странно и возвращает кортежи строк)
+                possible_lib_call = ''.join(possible_lib_call).replace("(", "").replace(")", "")
+                # ---- проверяем - есть ли в libs_converter питоновский аналог для этой js-вской библиотеки
+                if possible_lib_call in [*libs_converter.keys()]:
+                    # делаем замены имени библиотеки
+                    lines[i] = re.sub(possible_lib_call, libs_converter[possible_lib_call], lines[i])
+                    # добавляем название питоновский библиотеки чтобы потом импортировать её в начале файла
+                    libs_import_set.add(libs_converter[possible_lib_call].split('.')[0])
+
+            # далее аналогичный процесс но для типов а не библиотек
+            # одновременно происходят две РАЗДЕЛЬНЫЕ вещи (происходит только одна из них, но не две одновременно) -
             # 1) переменные у которых объявлен тип - сохраняются в словарь (types_storage)
-            #    точнее название самой переменной - и её тип
+            #    чтобы потом перевести название js-вского типа - на его python'овский аналог
             # 2) ищутся строки в которых у переменных вызывается какой то метод, или атрибут; если
             #    ранее данные об этой переменной и её типе были сохранены - значит мы можем
             #    переименовать название метода или атрибута
-            # UPD: также на этом этапе будет происходить трансляция обращений к различным библиотекам
-            # js-библиотеки и обращения к ним будут заменены на python'вские
-            for i in range(len(lines)):
-                line = lines[i]
-                new_data_in_types_storage = False
+            new_data_in_types_storage = False
+            for tp in types_converter:
+                js_type_name = types_converter[tp].get("js")
+                py_type_name = types_converter[tp].get("python")
 
-                # шаблон для регулярки - у какой-то библиотеки
-                # вызывается какая-то функция
-                lib_call_pattern = re.compile(
-                    r'([A-Za-z_$][A-Za-z0-9_$]*)(\.)([A-Za-z_$][A-Za-z0-9_$]*)(\([^()]*\))?'
-                )
-                # если в текущей строке происходит обращение к функции
-                # из какой-то библиотеки
-                match_result = re.findall(lib_call_pattern, lines[i])
-                if match_result is None:
-                    continue
-
-                for possible_lib_call in match_result:
-                    possible_lib_call = ''.join(possible_lib_call).replace("(", "").replace(")", "")
-                    if possible_lib_call in [*libs_converter.keys()]:
-                        lines[i] = re.sub(possible_lib_call, libs_converter[possible_lib_call], lines[i])
-                        libs_import_set.add(libs_converter[possible_lib_call].split('.')[0])
-
-                for tp in types_converter:
-                    js_type_name = types_converter[tp].get("js")
-                    py_type_name = types_converter[tp].get("python")
-
-                    # шаблон инициализации переменной, принадлежащей к какому-то классу
-                    pattern = r'\s*.+\s*=\s*' + js_type_name + r'(\(\))?'
-                    # if re.match(fr'\s*.+\s*=\s*{js_type_name}\(\)', line):
-                    if re.match(pattern, lines[i]):
-                        split_parts = re.split(r"\s*=\s*", lines[i])
-                        variable = split_parts[0].strip()
-                        lines[i] = re.sub(js_type_name, py_type_name, lines[i])
-                        # сохраняем переменную и её тип в хранилище
-                        # делается это для того, чтобы потом можно
-                        # было переименовать названия методов атрибутов класса
-                        types_storage[variable] = tp
-                        new_data_in_types_storage = True
-                        break
-                if new_data_in_types_storage:
-                    continue
-                # шаблон для регулярки - у какой-то переменной
-                # вызывается метод или атрибут класса
-                method_attribute_call_pattern = re.compile(
-                    r'([A-Za-z_$][A-Za-z0-9_$]*)\.([A-Za-z_$][A-Za-z0-9_$]*)(\([^()]*\))?'
-                )
-
-                # если в текущей строке происходит обращение к методу или атрибуту класса
-                # if method_attribute_call_pattern.match(lines[i]):
-                match_result = re.search(method_attribute_call_pattern, lines[i])
-
-                if match_result:
-                    split_parts = match_result.group().split(".")
+                # шаблон инициализации переменной, принадлежащей к какому-то классу
+                pattern = r'\s*.+\s*=\s*' + js_type_name + r'(\(\))?'
+                if re.match(pattern, lines[i]):
+                    split_parts = re.split(r"\s*=\s*", lines[i])
+                    # переменная для которой объявлен тип
                     variable = split_parts[0].strip()
-                    method_attribute = split_parts[1].strip()
-                    method_attribute = re.sub(r'\(.+', '', method_attribute)
-                    variables_in_storage = [*types_storage.keys()]
-                    # print(lines[i])
-                    if variable in variables_in_storage:
-                        repl = types_converter[types_storage[variable]].get("methods_attributes").get(method_attribute) or method_attribute
-                        lines[i] = re.sub(
-                            method_attribute,
-                            repl,
-                            lines[i]
-                        )
+                    # сразу же переименовываем тип
+                    lines[i] = re.sub(js_type_name, py_type_name, lines[i])
+                    # сохраняем переменную и её тип в хранилище
+                    # делается это для того, чтобы потом можно
+                    # было переименовать названия методов атрибутов класса
+                    types_storage[variable] = tp
+                    new_data_in_types_storage = True # случай 1) выполнился, меняем флаг чтобы не выполнился случай 2)
+                    break
+            if new_data_in_types_storage:
+                continue
+            # шаблон для регулярки - у какой-то переменной
+            # вызывается метод или атрибут класса
+            method_attribute_call_pattern = re.compile(
+                r'([A-Za-z_$][A-Za-z0-9_$]*)\.([A-Za-z_$][A-Za-z0-9_$]*)(\([^()]*\))?'
+            )
 
+            # проверяем действительно ли случилось обращение к атрибуту или методу класса (ну то есть типа,
+            # это для меня the same)
+            match_result = re.search(method_attribute_call_pattern, lines[i])
+
+            if match_result:
+                split_parts = match_result.group().split(".")
+                # переменная у которой случилось обращение
+                variable = split_parts[0].strip()
+                method_attribute = split_parts[1].strip()
+                # сам метод или атрибут
+                method_attribute = re.sub(r'\(.+', '', method_attribute)
+                # переменные которые мы ранее сохранили в хранилище переменных и их типов
+                variables_in_storage = [*types_storage.keys()]
+                # если ранее сохраняли данные об этой переменной - значит мы можем переименовать для этой переменной
+                # её методы и атрибуты
+                if variable in variables_in_storage:
+                    repl = types_converter[types_storage[variable]].get("methods_attributes").get(
+                        method_attribute) or method_attribute
+                    lines[i] = re.sub(
+                        method_attribute,
+                        repl,
+                        lines[i]
+                    )
+
+        # в самом конце импортируем нужные библиотеки
         for lib in libs_import_set:
             output_file.write(f'import {lib}\n')
+        # записываем в файл все переведенные строки
         output_file.writelines(lines)
     # print(types_storage)
 
