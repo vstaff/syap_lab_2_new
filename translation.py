@@ -218,12 +218,12 @@ types_converter = dict(
 
     array=dict(
         js=r"\[\]",
-        python=r"\[\]",
+        python="[]",
 
         methods_attributes=dict(
             push="append",
         ),
-    )
+    ),
 )
 
 def translate(filename: str) -> None:
@@ -274,7 +274,7 @@ def translate(filename: str) -> None:
                     py_type_name = types_converter[tp].get("python")
 
                     # шаблон инициализации переменной, принадлежащей к какому-то классу
-                    pattern = r'\s*.+\s*=\s*' + js_type_name + r'\(\)'
+                    pattern = r'\s*.+\s*=\s*' + js_type_name + r'(\(\))?'
                     # if re.match(fr'\s*.+\s*=\s*{js_type_name}\(\)', line):
                     if re.match(pattern, lines[i]):
                         split_parts = re.split(r"\s*=\s*", lines[i])
