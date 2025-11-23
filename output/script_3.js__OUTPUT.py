@@ -1,3 +1,4 @@
+import json
 # ОСОБЕННОСТЬ JS: декораторы - инструменты для расширения возможностей 
 # функций в JavaScript
 def myCacheDecorator(func):
@@ -6,17 +7,17 @@ def myCacheDecorator(func):
     # здесь этот ассоциативный массив будет выполнять роль кэша
     # он позволит ускорить работу функции, так как не придется пересчитывать
     # уже посчитанные значения функций 
-    cache = Map()
+    cache = dict()
 
     return (...args) => 
-        # ОСОБЕННОСТЬ JS: JSON.stringify - преобразует javascript-объект в строку
+        # ОСОБЕННОСТЬ JS: json.dumps - преобразует javascript-объект в строку
         # необходимо это для того, чтобы декоратор работал единым образом, 
         # независимо от характера и количества аргументов декорируемой функции
-        key = JSON.stringify(args)
+        key = json.dumps(args)
         
         # если в кеше уже подсчитана функция для этих аргументов 
         # - просто возвращаем результат из хранилища 
-        if (cache.has(key)):
+        if (cache.__contains__(key)):
             return cache.get(key)
         
         result = func(...args)
@@ -29,7 +30,7 @@ def myCacheDecorator(func):
 def myFibonacci(n):
 
     # проверка на то, чтобы n был положительным целым числом
-    if (not(Number.isInteger(n)) or n <= 0):
+    if (n <= 0):
         raise Exception("expected positive integer")
     
 

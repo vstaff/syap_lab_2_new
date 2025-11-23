@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46091788-03e2-4912-99ea-e54c8d42078b" name="Changes" comment="добавил комментарии &#10;убрал лишний цикл (хз как я вообще мог его добавить)">
-      <change beforePath="$PROJECT_DIR$/output/script_2.js__OUTPUT.py" beforeDir="false" afterPath="$PROJECT_DIR$/output/script_2.js__OUTPUT.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/script_3.js" beforeDir="false" afterPath="$PROJECT_DIR$/script_3.js" afterDir="false" />
+    <list default="true" id="46091788-03e2-4912-99ea-e54c8d42078b" name="Changes" comment="приступил к трансляции третьего скрипта &#10;важно заметить что при каждом запуске транслятора происходит такая вещь - импорты в script_2.js__OUTPUT.py временами меняют свой порядок из-за этого файл может попадать в измененные">
+      <change beforePath="$PROJECT_DIR$/output/script_3.js__OUTPUT.py" beforeDir="false" afterPath="$PROJECT_DIR$/output/script_3.js__OUTPUT.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/translation.py" beforeDir="false" afterPath="$PROJECT_DIR$/translation.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -154,7 +153,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763910810693</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="приступил к трансляции третьего скрипта &#10;важно заметить что при каждом запуске транслятора происходит такая вещь - импорты в script_2.js__OUTPUT.py временами меняют свой порядок из-за этого файл может попадать в измененные">
+      <option name="closed" value="true" />
+      <created>1763910995160</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1763910995160</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -176,6 +183,7 @@
     <MESSAGE value="решил избавиться от лямбда функций&#10;добавлен импорт библиотек" />
     <MESSAGE value="решил избавиться от лямбда функций&#10;добавлен импорт библиотек&#10;upd: второй скрипт также переведен" />
     <MESSAGE value="добавил комментарии &#10;убрал лишний цикл (хз как я вообще мог его добавить)" />
-    <option name="LAST_COMMIT_MESSAGE" value="добавил комментарии &#10;убрал лишний цикл (хз как я вообще мог его добавить)" />
+    <MESSAGE value="приступил к трансляции третьего скрипта &#10;важно заметить что при каждом запуске транслятора происходит такая вещь - импорты в script_2.js__OUTPUT.py временами меняют свой порядок из-за этого файл может попадать в измененные" />
+    <option name="LAST_COMMIT_MESSAGE" value="приступил к трансляции третьего скрипта &#10;важно заметить что при каждом запуске транслятора происходит такая вещь - импорты в script_2.js__OUTPUT.py временами меняют свой порядок из-за этого файл может попадать в измененные" />
   </component>
 </project>

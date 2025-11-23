@@ -239,12 +239,24 @@ types_converter = dict(
             push="append",
         ),
     ),
+
+    map=dict(
+        js="Map",
+        python="dict",
+
+        methods_attributes=dict(
+            get="get",
+            set="set",
+            has="__contains__"
+        )
+    )
 )
 
 # перевод обращения к различным библиотекам и их функциям
 libs_converter = {
     "Math.random": "random.random",
     "Math.floor": "math.floor",
+    "JSON.stringify": "json.dumps",
 }
 
 def translate(filename: str) -> None:
@@ -311,7 +323,8 @@ def translate(filename: str) -> None:
             for possible_lib_call in match_result:
                 # (предварительно нужно объединить строки
                 # так как метод findall работает странно и возвращает кортежи строк)
-                possible_lib_call = ''.join(possible_lib_call).replace("(", "").replace(")", "")
+                possible_lib_call = ''.join(possible_lib_call)
+                possible_lib_call = re.sub(r'\(.*\)', '', possible_lib_call)
                 # ---- проверяем - есть ли в libs_converter питоновский аналог для этой js-вской библиотеки
                 if possible_lib_call in [*libs_converter.keys()]:
                     # делаем замены имени библиотеки

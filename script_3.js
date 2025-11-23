@@ -27,7 +27,7 @@ function myCacheDecorator(func) {
 // функция для подсчета n-ого числа Фибоначчи
 function myFibonacci(n) {
   // проверка на то, чтобы n был положительным целым числом
-  if (!(Number.isInteger(n)) || n <= 0) {
+  if (n <= 0) {
     throw new Error("expected positive integer");
   }
 
