@@ -148,7 +148,41 @@ REGEXES = dict(
             (r'.?\+\+', '1', 1),
             (r'\)', '):', 1)
         ]
-    )
+    ),
+
+    # теперь для второго скрипта
+    # важно что при объявлении генераторов знак * должен стоять именно возле function
+    function_declaration=dict(
+        regex=r'function\*?',
+        replacements=[
+            (r'function\*?', 'def', 1),
+            (r'\s*{', ':\n', 1)
+        ]
+    ),
+
+    console_log=dict(
+        regex=r'\s*console\.log',
+        replacements=[
+            (r'console\.log', 'print', 1),
+        ]
+    ),
+
+    string_interpolation=dict(
+        regex=r'.+`.+`',
+        replacements=[
+            (r'`', "f'", 1),
+            (r'`', "'", 1),
+        ]
+    ),
+
+    for_loop_in=dict(
+        regex=r'\s*for\s*\((const|let)\s+.+\)\s*{\n',
+        replacements=[
+            (r'for\s*\((const|let)\s+', 'for ', 1),
+            (r'\s+of\s+', ' in ', 1),
+            (r'\)\s*{\n', ':\n', 1)
+        ]
+    ),
 )
 
 SMALL_PATCHES = [
@@ -160,15 +194,45 @@ SMALL_PATCHES = [
     ("let ", ""),
     ("Error", "Exception"),
 
-    ("{", ""),
-    ("}", ""),
+    ("{\n", "\n"),
+    ("}\n", "\n"),
     ("new ", ""),
 
     (r"  ", "    "),
+
+    # скрипт 2
+    ('const ', '')
 ]
+
+# перевод типов из одного языка на другой
+types_converter = dict(
+    set=dict(
+        js="Set",
+        python="set",
+
+        methods_attributes=dict(
+            has="__contains__",
+            size="__len__()",
+        )
+    ),
+
+    array=dict(
+        js=r"\[\]",
+        python=r"\[\]",
+
+        methods_attributes=dict(
+            push="append",
+        ),
+    )
+)
 
 def translate(filename: str) -> None:
     lines: list[str] = []
+
+    # хранит информацию о том, какой тип должен быть у переменной
+    # после трансляции на питон
+    types_storage = dict()
+
     with open(filename, "r", encoding="utf-8") as file:
         lines = file.readlines()
 
@@ -194,10 +258,67 @@ def translate(filename: str) -> None:
             for pattern, replacement in SMALL_PATCHES:
                 lines[i] = re.sub(pattern, replacement, lines[i])
 
+            # промежуточный этап - преобразование типов между языками
+            # для начала мы сохраняем в хранилище данных о типа переменных - тип переменной
+            # одновременно (то есть в одном цикле происходят две вещи -
+            # 1) переменные у которых объявлен тип - сохраняются в словарь (types_storage)
+            #    точнее название самой переменной - и её тип
+            # 2) ищутся строки в которых у переменных вызывается какой то метод, или атрибут; если
+            #    ранее данные об этой переменной и её типе были сохранены - значит мы можем
+            #    переименовать название метода или атрибута
+            for i in range(len(lines)):
+                line = lines[i]
+                new_data_in_types_storage = False
+                for tp in types_converter:
+                    js_type_name = types_converter[tp].get("js")
+                    py_type_name = types_converter[tp].get("python")
+
+                    # шаблон инициализации переменной, принадлежащей к какому-то классу
+                    pattern = r'\s*.+\s*=\s*' + js_type_name + r'\(\)'
+                    # if re.match(fr'\s*.+\s*=\s*{js_type_name}\(\)', line):
+                    if re.match(pattern, lines[i]):
+                        split_parts = re.split(r"\s*=\s*", lines[i])
+                        variable = split_parts[0].strip()
+                        lines[i] = re.sub(js_type_name, py_type_name, lines[i])
+                        # сохраняем переменную и её тип в хранилище
+                        # делается это для того, чтобы потом можно
+                        # было переименовать названия методов атрибутов класса
+                        types_storage[variable] = tp
+                        new_data_in_types_storage = True
+                        break
+                if new_data_in_types_storage:
+                    continue
+                # шаблон для регулярки - у какой-то переменной
+                # вызывается метод или атрибут класса
+                method_attribute_call_pattern = re.compile(
+                    r'([A-Za-z_$][A-Za-z0-9_$]*)\.([A-Za-z_$][A-Za-z0-9_$]*)(\([^()]*\))?'
+                )
+
+                # если в текущей строке происходит обращение к методу или атрибуту класса
+                # if method_attribute_call_pattern.match(lines[i]):
+                match_result = re.search(method_attribute_call_pattern, lines[i])
+
+                if match_result:
+                    split_parts = match_result.group().split(".")
+                    variable = split_parts[0].strip()
+                    method_attribute = split_parts[1].strip()
+                    method_attribute = re.sub(r'\(.+', '', method_attribute)
+                    variables_in_storage = [*types_storage.keys()]
+                    print(lines[i])
+                    if variable in variables_in_storage:
+                        repl = types_converter[types_storage[variable]].get("methods_attributes").get(method_attribute) or method_attribute
+                        lines[i] = re.sub(
+                            method_attribute,
+                            repl,
+                            lines[i]
+                        )
+
         output_file.writelines(lines)
+    print(types_storage)
 
 def main():
-    translate("./script_1.js")
+    # translate("./script_1.js")
+    translate("./script_2.js")
 
 
 if __name__ == '__main__':

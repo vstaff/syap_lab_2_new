@@ -4,13 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46091788-03e2-4912-99ea-e54c8d42078b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/syap_lab_2_new.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/translation.py" afterDir="false" />
+    <list default="true" id="46091788-03e2-4912-99ea-e54c8d42078b" name="Changes" comment="наконец то я смог странслировать первый скрипт">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/script_1.js__OUTPUT.py" beforeDir="false" afterPath="$PROJECT_DIR$/output/script_1.js__OUTPUT.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/script_1.js" beforeDir="false" afterPath="$PROJECT_DIR$/script_1.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/script_2.js" beforeDir="false" afterPath="$PROJECT_DIR$/script_2.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/translation.py" beforeDir="false" afterPath="$PROJECT_DIR$/translation.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,6 +26,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "vstaff"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/vstaff/syap_lab_2_new.git",
+    "accountId": "75cf217b-fbc2-4319-a893-b1b29fa3df32"
+  }
+}]]></component>
   <component name="ProjectColorInfo"><![CDATA[{
   "associatedIndex": 5
 }]]></component>
@@ -40,6 +51,7 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Python.translation.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "master"
   }
@@ -88,15 +100,28 @@
       <option name="presentableId" value="Default" />
       <updated>1763881068623</updated>
     </task>
+    <task id="LOCAL-00001" summary="наконец то я смог странслировать первый скрипт">
+      <option name="closed" value="true" />
+      <created>1763895449501</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1763895449501</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="наконец то я смог странслировать первый скрипт" />
+    <option name="LAST_COMMIT_MESSAGE" value="наконец то я смог странслировать первый скрипт" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/translation.py</url>
-          <line>180</line>
-          <option name="timeStamp" value="4" />
+          <line>271</line>
+          <option name="timeStamp" value="7" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

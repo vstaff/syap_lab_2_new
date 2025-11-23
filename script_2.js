@@ -6,18 +6,22 @@ function* getRandomItem(arr) {
 
   while (prevIndices.size != AMOUNT) {
     const index = getRandomNumber(0, AMOUNT - 1);
-    
-    // ОСОБЕННОСТЬ JS: строковая интерполяция 
-    console.log(`index=${index}`)
-    
+
+    // ОСОБЕННОСТЬ JS: строковая интерполяция
+    console.log(
+      `index=${index}`
+    )
+
     if (prevIndices.has(index)) {
       continue;
     };
     prevIndices.add(index);
-    
-    // ОСОБЕННОСТЬ JS: строковая интерполяция 
-    console.log(`arr[index]=${arr[index]}`)
-    
+
+    // ОСОБЕННОСТЬ JS: строковая интерполяция
+    console.log(
+      `arr[index]=${arr[index]}`
+    )
+
     // ОСОБЕННОСТЬ JS: ключевое слово yield - 
     // в отличие от return - yield позволяет продолжить
     // выполнение генератора 
@@ -43,9 +47,8 @@ for (const value of iterator) {
   numbersRandomized.push(value);
 }
 
-for (let i = 0; i < AMOUNT; ++i) {
+for (let i = 0; i < AMOUNT; i++) {
   console.log(
-    `numbers[${i}] = ${numbers[i]} 
-numbersRandomized[${i}] = ${numbersRandomized[i]}`
+    `numbers[${i}] = ${numbers[i]}\nnumbersRandomized[${i}] = ${numbersRandomized[i]}`
   );
 }
