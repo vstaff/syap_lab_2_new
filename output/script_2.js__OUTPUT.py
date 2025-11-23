@@ -1,5 +1,5 @@
-import random
 import math
+import random
 AMOUNT = 10
 
 # ОСОБЕННОСТЬ JS - функция генератор
