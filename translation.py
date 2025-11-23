@@ -161,7 +161,7 @@ REGEXES = dict(
     # теперь для второго скрипта
     # важно что при объявлении генераторов знак * должен стоять именно возле function
     function_declaration=dict(
-        regex=r'function\*?',
+        regex=r'\s*function\*?',
         replacements=[
             (r'function\*?', 'def', 1),
             (r'\s*{', ':\n', 1)
@@ -180,6 +180,7 @@ REGEXES = dict(
         replacements=[
             (r'`', "f'", 1),
             (r'`', "'", 1),
+            (r'\${', '{', 0),
         ]
     ),
 
@@ -191,6 +192,15 @@ REGEXES = dict(
             (r'\)\s*{\n', ':\n', 1)
         ]
     ),
+
+    # # скрипт 3
+    # # неопределенное количество переменных
+    # args=dict(
+    #     regex=r'.+\(\.\.\.[\w_]+',
+    #     replacements=[
+    #         (r'\.{3}', '*', 1)
+    #     ]
+    # )
 )
 
 # мелкие изменения которые можно выполнить в конце
@@ -211,7 +221,10 @@ SMALL_PATCHES = [
     (r"  ", "    "),
 
     # скрипт 2
-    ('const ', '')
+    ('const ', ''),
+
+    # скрипт 3
+    (r'\.{3}', '*')
 ]
 
 # перевод типов из одного языка на другой
@@ -246,7 +259,7 @@ types_converter = dict(
 
         methods_attributes=dict(
             get="get",
-            set="set",
+            set="setdefault",
             has="__contains__"
         )
     )

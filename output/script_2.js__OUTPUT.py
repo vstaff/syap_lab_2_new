@@ -1,5 +1,5 @@
-import random
 import math
+import random
 AMOUNT = 10
 
 # ОСОБЕННОСТЬ JS - функция генератор
@@ -12,7 +12,7 @@ def getRandomItem(arr):
 
         # ОСОБЕННОСТЬ JS: строковая интерполяция
         print(
-            f'index=${index}'
+            f'index={index}'
         )
 
         if (prevIndices.__contains__(index)):
@@ -22,7 +22,7 @@ def getRandomItem(arr):
 
         # ОСОБЕННОСТЬ JS: строковая интерполяция
         print(
-            f'arr[index]=${arr[index]}'
+            f'arr[index]={arr[index]}'
         )
 
         # ОСОБЕННОСТЬ JS: ключевое слово yield -
@@ -54,6 +54,6 @@ for value in iterator:
 
 for i in range(0, AMOUNT, 1): 
     print(
-        f'numbers[${i}] = ${numbers[i]}\nnumbersRandomized[${i}] = ${numbersRandomized[i]}'
+        f'numbers[{i}] = {numbers[i]}\nnumbersRandomized[{i}] = {numbersRandomized[i]}'
     )
 
