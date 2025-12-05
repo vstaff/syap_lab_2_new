@@ -487,6 +487,12 @@ def translate(filename: str) -> None:
                         repl,
                         lines[i]
                     )
+            # 4. УБИРАЕМ лишние внешние скобки в if
+            lines[i] = re.sub(
+                r'^(\s*)if\s*\((.*)\):',
+                r'\1if \2:',
+                lines[i]
+            )
 
         # после всех преобразований — строим mapping имён
         name_mapping = build_name_mapping(lines, class_names)
@@ -498,12 +504,3 @@ def translate(filename: str) -> None:
         # записываем в файл все переведенные строки
         output_file.writelines(lines)
     # print(types_storage)
-
-def main():
-    translate("./script_1.js")
-    translate("./script_2.js")
-    translate("./script_3.js")
-
-
-if __name__ == '__main__':
-    main()
