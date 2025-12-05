@@ -1,4 +1,20 @@
 import re
+import keyword
+import builtins
+
+PY_KEYWORDS = set(keyword.kwlist)
+PY_BUILTINS = set(dir(builtins))
+
+def to_snake_case(name: str) -> str:
+    """
+    camelCase / PascalCase -> snake_case
+    """
+    # Первый проход: 'HTTPServerError' -> 'HTTP_Server_Error'
+    s1 = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', name)
+    # Второй проход: 'myXMLParser' -> 'my_XML_Parser'
+    s2 = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', s1)
+    return s2.lower()
+
 
 # словарь шаблонов регулярных выражений под основные конструкции языка javascript
 # объявления классов, методов, комментарии, объявление и инициализация полей классов и т.д.
@@ -272,6 +288,67 @@ libs_converter = {
     "JSON.stringify": "json.dumps",
 }
 
+
+def build_name_mapping(lines: list[str], class_names: set[str]) -> dict[str, str]:
+    """
+    Строит отображение старое_имя -> новое_имя в snake_case
+    для всех идентификаторов, которые не являются ключевыми словами,
+    builtin'ами, именами классов и т.п.
+    """
+    name_pattern = re.compile(r'\b[A-Za-z_][A-Za-z0-9_]*\b')
+    mapping: dict[str, str] = {}
+
+    for line in lines:
+        for m in name_pattern.finditer(line):
+            name = m.group(0)
+
+            # пропускаем ключевые слова / builtins / спец-имена
+            if name in PY_KEYWORDS:
+                continue
+            if name in PY_BUILTINS:
+                continue
+            if name in {"self", "None", "True", "False"}:
+                continue
+            if name in class_names:
+                continue
+
+            # уже нормальное snake_case
+            if name == name.lower() and "_" in name:
+                continue
+
+            # нет заглавных букв — уже нижний регистр, менять нечего
+            if not any(ch.isupper() for ch in name):
+                continue
+
+            new_name = to_snake_case(name)
+            if new_name != name:
+                mapping.setdefault(name, new_name)
+
+    return mapping
+
+
+def apply_name_mapping(lines: list[str], mapping: dict[str, str]) -> list[str]:
+    """
+    Применяет отображение имён ко всем строкам (по отдельным словам).
+    """
+    if not mapping:
+        return lines
+
+    # готовим regex'ы заранее, чтобы не собирать их на каждой строке
+    patterns = {
+        old: re.compile(r'\b' + re.escape(old) + r'\b')
+        for old in mapping
+    }
+
+    new_lines: list[str] = []
+    for line in lines:
+        for old, new in mapping.items():
+            line = patterns[old].sub(new, line)
+        new_lines.append(line)
+
+    return new_lines
+
+
 def translate(filename: str) -> None:
     """
     Трансляция кода из файла с именем filename
@@ -291,6 +368,14 @@ def translate(filename: str) -> None:
 
     with open(filename, "r", encoding="utf-8") as file:
         lines = file.readlines()
+
+    # имена классов (их не трогаем, оставляем CamelCase)
+    class_names: set[str] = set()
+    class_decl_pattern = re.compile(r'\s*class\s+([A-Za-z_][A-Za-z0-9_]*)\s*\{')
+    for line in lines:
+        m = class_decl_pattern.match(line)
+        if m:
+            class_names.add(m.group(1))
 
     # первичная трансляция - переводим крупные конструкции
     for i in range(len(lines)):
@@ -402,6 +487,10 @@ def translate(filename: str) -> None:
                         repl,
                         lines[i]
                     )
+
+        # после всех преобразований — строим mapping имён
+        name_mapping = build_name_mapping(lines, class_names)
+        lines = apply_name_mapping(lines, name_mapping)
 
         # в самом конце импортируем нужные библиотеки
         for lib in libs_import_set:
